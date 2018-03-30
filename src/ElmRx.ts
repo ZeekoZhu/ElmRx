@@ -7,50 +7,50 @@ export type ElmRxUpdateResult<TState, TMsgType> = TState | [TState, TMsgType[]];
 export type ElmRxPattern<TMsg, TState, TMsgType> =
     [new (...args: any[]) => TMsg, (acc: TState, msg: TMsg, $msg: Subject<TMsgType>) => ElmRxUpdateResult<TState, TMsgType>];
 
-export class ElmArch<TState, TMsgType> {
+export class ElmArch<TModel, TMsgType> {
     private readonly $msg = new Subject<TMsgType>();
     /**
      * Pattern matching syntax
      * @template TMsg
      * @param {new (...args: any[]) => TMsg} type constructor of Msg
-     * @param {(acc: TState, msg: TMsg, $msg: Subject<TMsgType>) => ElmRxUpdateResult<TState, TMsgType>} reducer method to compute new state
-     * @returns {ElmRxPattern<TMsg, TState, TMsgType>}
+     * @param {(acc: TModel, msg: TMsg, $msg: Subject<TMsgType>) => ElmRxUpdateResult<TModel, TMsgType>} reducer method to compute new state
+     * @returns {ElmRxPattern<TMsg, TModel, TMsgType>}
      * @memberof ElmArch
      */
     caseOf<TMsg>(
         type: new (...args: any[]) => TMsg,
-        reducer: (acc: TState, msg: TMsg, $msg: Subject<TMsgType>) => ElmRxUpdateResult<TState, TMsgType>)
-        : ElmRxPattern<TMsg, TState, TMsgType> {
+        reducer: (acc: TModel, msg: TMsg, $msg: Subject<TMsgType>) => ElmRxUpdateResult<TModel, TMsgType>)
+        : ElmRxPattern<TMsg, TModel, TMsgType> {
         return [type, reducer];
     }
     /**
      * Generate a result of a new state with a sets of msgs, these msgs will be published after new state is published
-     * @param {TState} newState
+     * @param {TModel} newModel
      * @param {...TMsgType[]} msgs
-     * @returns {ElmRxUpdateResult<TState, TMsgType>}
+     * @returns {ElmRxUpdateResult<TModel, TMsgType>}
      * @memberof ElmArch
      */
-    nextWithCmds(newState: TState, ...msgs: TMsgType[]): ElmRxUpdateResult<TState, TMsgType> {
+    nextWithCmds(newModel: TModel, ...msgs: TMsgType[]): ElmRxUpdateResult<TModel, TMsgType> {
         if (arguments.length === 1) {
-            return newState;
+            return newModel;
         } else {
-            return [newState, msgs];
+            return [newModel, msgs];
         }
     }
-    matchWith<TMsg>($msg: Subject<TMsgType>, patterns: ElmRxPattern<TMsg, TState, TMsgType>[]) {
-        return (acc: ElmRxUpdateResult<TState, TMsgType>, msg: TMsg) => {
-            const state = acc instanceof Array ? acc[0] : acc;
+    matchWith<TMsg>($msg: Subject<TMsgType>, patterns: ElmRxPattern<TMsg, TModel, TMsgType>[]) {
+        return (acc: ElmRxUpdateResult<TModel, TMsgType>, msg: TMsg) => {
+            const model = acc instanceof Array ? acc[0] : acc;
             for (const it of patterns) {
                 if (msg instanceof it[0]) {
-                    return it[1](state, msg, $msg);
+                    return it[1](model, msg, $msg);
                 }
             }
             throw new Error('Invalid Message Type');
         };
     }
 
-    begin(initState: TState, patterns: ElmRxPattern<any, TState, TMsgType>[], debug = false) {
-        const $res = new BehaviorSubject<TState>(initState);
+    begin(initState: TModel, patterns: ElmRxPattern<any, TModel, TMsgType>[], debug = false) {
+        const $res = new BehaviorSubject<TModel>(initState);
         this.$msg.pipe(
             tap(m => {
                 if (debug) {
@@ -58,23 +58,23 @@ export class ElmArch<TState, TMsgType> {
                 }
             }),
             scan(this.matchWith(this.$msg, patterns), initState),
-            tap((s: ElmRxUpdateResult<TState, TMsgType>) => {
+            tap((result: ElmRxUpdateResult<TModel, TMsgType>) => {
                 if (debug) {
-                    if (s instanceof Array) {
-                        console.log('%cState %O %cCmds %O', 'color:green', s[0], 'color:darkcyan', s[1]);
+                    if (result instanceof Array) {
+                        console.log('%cState %O %cCmds %O', 'color:green', result[0], 'color:darkcyan', result[1]);
                     } else {
-                        console.log('%cState', 'color:green', s);
+                        console.log('%cState', 'color:green', result);
                     }
                 }
             })
         )
-            .subscribe((s: ElmRxUpdateResult<TState, TMsgType>) => {
-                if (s instanceof Array) {
-                    const [state, msgs] = s;
-                    $res.next(state);
+            .subscribe((updateResult: ElmRxUpdateResult<TModel, TMsgType>) => {
+                if (updateResult instanceof Array) {
+                    const [model, msgs] = updateResult;
+                    $res.next(model);
                     msgs.forEach(m => this.$msg.next(m));
                 } else {
-                    $res.next(s);
+                    $res.next(updateResult);
                 }
             });
         return $res;
@@ -86,12 +86,12 @@ export class ElmArch<TState, TMsgType> {
 }
 
 export abstract class ElmArchService<TModel, TMsgType> {
-    public state$: Observable<TModel>;
+    public model$: Observable<TModel>;
     protected readonly arch = new ElmArch<TModel, TMsgType>();
     abstract update(): ElmRxPattern<any, TModel, TMsgType>[];
-    protected abstract initState(): TModel;
-    public get state() {
-        return (this.state$ as BehaviorSubject<TModel>).value;
+    protected abstract initModel(): TModel;
+    public get model() {
+        return (this.model$ as BehaviorSubject<TModel>).value;
     }
 
 
@@ -100,6 +100,6 @@ export abstract class ElmArchService<TModel, TMsgType> {
     }
 
     constructor(debug = false) {
-        this.state$ = this.arch.begin(this.initState(), this.update(), debug);
+        this.model$ = this.arch.begin(this.initModel(), this.update(), debug);
     }
 }
