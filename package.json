@@ -1,12 +1,9 @@
 {
     "name": "elm-rx",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "main": "index.js",
     "author": "zeeko",
     "license": "MIT",
-    "dependencies": {
-        "rxjs": "^5.5.8"
-    },
     "devDependencies": {
         "codelyzer": "^4.2.1"
     },
@@ -18,5 +15,8 @@
         "url": "https://github.com/ZeekoZhu/ElmRx/issues"
     },
     "homepage": "https://github.com/ZeekoZhu/ElmRx#readme",
-    "description": ""
+    "description": "",
+    "peerDependencies": {
+        "rxjs": "^5.5.8"
+    }
 }
