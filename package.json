@@ -5,8 +5,7 @@
     "author": "zeeko",
     "license": "MIT",
     "dependencies": {
-        "rxjs": "^5.5.8",
-        "tsutils": "^2.25.0"
+        "rxjs": "^5.5.8"
     },
     "devDependencies": {
         "codelyzer": "^4.2.1"
