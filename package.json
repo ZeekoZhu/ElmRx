@@ -9,5 +9,14 @@
     },
     "devDependencies": {
         "codelyzer": "^4.2.1"
-    }
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ZeekoZhu/ElmRx.git"
+    },
+    "bugs": {
+        "url": "https://github.com/ZeekoZhu/ElmRx/issues"
+    },
+    "homepage": "https://github.com/ZeekoZhu/ElmRx#readme",
+    "description": ""
 }
