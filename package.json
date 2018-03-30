@@ -1,7 +1,7 @@
 {
     "name": "elm-rx",
     "version": "1.0.0",
-    "main": "index.js",
+    "main": "index.ts",
     "author": "zeeko",
     "license": "MIT",
     "dependencies": {
