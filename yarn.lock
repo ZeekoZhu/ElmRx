@@ -96,3 +96,13 @@ symbol-observable@1.0.1:
 through@X.X.X:
   version "2.3.8"
   resolved "http://registry.npm.taobao.org/through/download/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
+
+tslib@^1.8.1:
+  version "1.9.0"
+  resolved "http://registry.npm.taobao.org/tslib/download/tslib-1.9.0.tgz#e37a86fda8cbbaf23a057f473c9f4dc64e5fc2e8"
+
+tsutils@^2.25.0:
+  version "2.25.0"
+  resolved "http://registry.npm.taobao.org/tsutils/download/tsutils-2.25.0.tgz#14d616ef59224a3c9fb7eb483e1c182b6665ae5e"
+  dependencies:
+    tslib "^1.8.1"

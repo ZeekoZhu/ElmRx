@@ -1,0 +1,6 @@
+.gitignore
+*.json
+*.ts
+yarn.lock
+!*.d.ts
+/.vscode
