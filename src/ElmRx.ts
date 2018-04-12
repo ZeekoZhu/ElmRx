@@ -88,7 +88,7 @@ export class ElmArch<TModel, TMsgType> {
 export abstract class ElmArchService<TModel, TMsgType> {
     public model$: Observable<TModel>;
     protected readonly arch = new ElmArch<TModel, TMsgType>();
-    abstract update(): ElmRxPattern<any, TModel, TMsgType>[];
+    protected abstract update(): ElmRxPattern<any, TModel, TMsgType>[];
     protected abstract initModel(): TModel;
     public get model() {
         return (this.model$ as BehaviorSubject<TModel>).value;
