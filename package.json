@@ -15,9 +15,7 @@
     "homepage": "https://github.com/ZeekoZhu/ElmRx#readme",
     "description": "",
     "peerDependencies": {
-        "rxjs": "^5.5.8"
+        "rxjs": "^6.0.0"
     },
-    "dependencies": {
-        "rxjs": "6"
-    }
+    "dependencies": {}
 }

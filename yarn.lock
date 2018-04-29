@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-rxjs@6:
+rxjs@^6.0.0:
   version "6.0.0"
   resolved "http://registry.npm.taobao.org/rxjs/download/rxjs-6.0.0.tgz#d647e029b5854617f994c82fe57a4c6747b352da"
   dependencies:
