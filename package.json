@@ -16,5 +16,8 @@
     "description": "",
     "peerDependencies": {
         "rxjs": "^5.5.8"
+    },
+    "dependencies": {
+        "rxjs": "6"
     }
 }

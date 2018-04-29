@@ -2,3 +2,12 @@
 # yarn lockfile v1
 
 
+rxjs@6:
+  version "6.0.0"
+  resolved "http://registry.npm.taobao.org/rxjs/download/rxjs-6.0.0.tgz#d647e029b5854617f994c82fe57a4c6747b352da"
+  dependencies:
+    tslib "^1.9.0"
+
+tslib@^1.9.0:
+  version "1.9.0"
+  resolved "http://registry.npm.taobao.org/tslib/download/tslib-1.9.0.tgz#e37a86fda8cbbaf23a057f473c9f4dc64e5fc2e8"
