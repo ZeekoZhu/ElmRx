@@ -1,6 +1,6 @@
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { tap, scan } from 'rxjs/operators';
 
 export type ElmRxUpdateResult<TState, TMsgType> = TState | [TState, TMsgType[]];
