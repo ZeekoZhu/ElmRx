@@ -4,7 +4,11 @@
     "main": "index.js",
     "author": "zeeko",
     "license": "MIT",
+    "scripts": {
+        "test": "tsc && jasmine --config=./jasmine.json"
+    },
     "devDependencies": {
+        "@types/jasmine": "^2.8.7",
         "jasmine": "^3.1.0",
         "rxjs": "^6.1.0"
     },
