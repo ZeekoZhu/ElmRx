@@ -4,7 +4,10 @@
     "main": "index.js",
     "author": "zeeko",
     "license": "MIT",
-    "devDependencies": {},
+    "devDependencies": {
+        "jasmine": "^3.1.0",
+        "rxjs": "^6.1.0"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/ZeekoZhu/ElmRx.git"
@@ -15,7 +18,7 @@
     "homepage": "https://github.com/ZeekoZhu/ElmRx#readme",
     "description": "",
     "peerDependencies": {
-        "rxjs": "^6.0.0"
+        "rxjs": "^6.1.0"
     },
     "dependencies": {}
 }
