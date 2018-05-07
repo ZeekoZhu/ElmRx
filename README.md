@@ -6,7 +6,9 @@
 
 ## What is it
 
-See this [blog post](https://gianthard.rocks/a/22).
+This lib is try to emulate Elm Architecture in JavaScript with rxjs. It provides a way to build your app's model, messages and update methods in a Elm Style, and your view layer can consume the output obervable to render the UI reactively.
+
+For more details, see this [blog post](https://gianthard.rocks/a/22).
 
 ## Version
 
