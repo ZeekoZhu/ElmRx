@@ -9,6 +9,7 @@ export type ElmRxPattern<TMsg, TState, TMsgType> =
 
 export class ElmArch<TModel, TMsgType> {
     private readonly $msg = new Subject<TMsgType>();
+    private $model: BehaviorSubject<TModel>;
     /**
      * Pattern matching syntax
      * @template TMsg
@@ -50,7 +51,7 @@ export class ElmArch<TModel, TMsgType> {
     }
 
     begin(initState: TModel, patterns: ElmRxPattern<any, TModel, TMsgType>[], debug = false) {
-        const $res = new BehaviorSubject<TModel>(initState);
+        this.$model = new BehaviorSubject<TModel>(initState);
         this.$msg.pipe(
             tap(m => {
                 if (debug) {
@@ -71,13 +72,18 @@ export class ElmArch<TModel, TMsgType> {
             .subscribe((updateResult: ElmRxUpdateResult<TModel, TMsgType>) => {
                 if (updateResult instanceof Array) {
                     const [model, msgs] = updateResult;
-                    $res.next(model);
+                    this.$model.next(model);
                     msgs.forEach(m => this.$msg.next(m));
                 } else {
-                    $res.next(updateResult);
+                    this.$model.next(updateResult);
                 }
             });
-        return $res;
+        return this.$model;
+    }
+
+    stop() {
+        this.$msg.complete();
+        this.$model.complete();
     }
 
     /**
@@ -98,24 +104,5 @@ export class ElmArch<TModel, TMsgType> {
      */
     sendAsync(msg: TMsgType) {
         Promise.resolve().then(() => this.send(msg));
-    }
-}
-
-export abstract class ElmArchService<TModel, TMsgType> {
-    public model$: Observable<TModel>;
-    protected readonly arch = new ElmArch<TModel, TMsgType>();
-    protected abstract update(): ElmRxPattern<any, TModel, TMsgType>[];
-    protected abstract initModel(): TModel;
-    public get model() {
-        return (this.model$ as BehaviorSubject<TModel>).value;
-    }
-
-
-    send(msg: TMsgType) {
-        this.arch.send(msg);
-    }
-
-    constructor(debug = false) {
-        this.model$ = this.arch.begin(this.initModel(), this.update(), debug);
     }
 }
