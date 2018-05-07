@@ -1,6 +1,6 @@
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { tap, scan } from 'rxjs/operators';
 
 export type ElmRxUpdateResult<TState, TMsgType> = TState | [TState, TMsgType[]];
@@ -24,7 +24,7 @@ export class ElmArch<TModel, TMsgType> {
         return [type, reducer];
     }
     /**
-     * Generate a result of a new state with a sets of msgs, these msgs will be published after new state is published
+     * ***Deprecated: Use sendAsync instead*** Generate a result of a new state with a sets of msgs, these msgs will be published after new state is published
      * @param {TModel} newModel
      * @param {...TMsgType[]} msgs
      * @returns {ElmRxUpdateResult<TModel, TMsgType>}
@@ -80,8 +80,24 @@ export class ElmArch<TModel, TMsgType> {
         return $res;
     }
 
+    /**
+     * Dispatch a new msg synchronously
+     * 
+     * @param {TMsgType} msg 
+     * @memberof ElmArch
+     */
     send(msg: TMsgType) {
         this.$msg.next(msg);
+    }
+
+    /**
+     * Dispatch a new msg when you are in update methods
+     * 
+     * @param {TMsgType} msg 
+     * @memberof ElmArch
+     */
+    sendAsync(msg: TMsgType) {
+        Promise.resolve().then(() => this.send(msg));
     }
 }
 
