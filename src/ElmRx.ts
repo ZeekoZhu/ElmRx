@@ -83,6 +83,11 @@ export class ElmArch<TModel, TMsgType> {
     send(msg: TMsgType) {
         this.$msg.next(msg);
     }
+
+    sendAsync(msg: TMsgType) {
+        Promise.resolve().then(() => this.send(msg));
+    }
+
 }
 
 export abstract class ElmArchService<TModel, TMsgType> {
