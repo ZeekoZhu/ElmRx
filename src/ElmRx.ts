@@ -1,15 +1,14 @@
-import { BehaviorSubject } from 'rxjs';
-import { Subject } from 'rxjs';
-import { Observable } from 'rxjs';
-import { tap, scan } from 'rxjs/operators';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { scan, tap } from 'rxjs/operators';
 
-export type ElmRxUpdateResult<TState, TMsgType> = TState | [TState, TMsgType[]];
+export type ElmRxUpdateResult<TState, TMsgType> = TState | [TState, TMsgType[]] | ElmRxCmd<TState, TMsgType>;
 export type ElmRxPattern<TMsg, TState, TMsgType> =
     [new (...args: any[]) => TMsg, (acc: TState, msg: TMsg, $msg: Subject<TMsgType>) => ElmRxUpdateResult<TState, TMsgType>];
-
+export type ElmRxCmd<TState, TMsgType> = [TState, Promise<TMsgType>];
 export class ElmArch<TModel, TMsgType> {
     private readonly $msg = new Subject<TMsgType>();
     private $model: BehaviorSubject<TModel>;
+    private accumulator: (acc: ElmRxUpdateResult<TModel, TMsgType>, msg: any) => ElmRxUpdateResult<TModel, TMsgType>;
     /**
      * Pattern matching syntax
      * @template TMsg
@@ -18,10 +17,10 @@ export class ElmArch<TModel, TMsgType> {
      * @returns {ElmRxPattern<TMsg, TModel, TMsgType>}
      * @memberof ElmArch
      */
-    caseOf<TMsg>(
+    caseOf = <TMsg>(
         type: new (...args: any[]) => TMsg,
         reducer: (acc: TModel, msg: TMsg, $msg: Subject<TMsgType>) => ElmRxUpdateResult<TModel, TMsgType>)
-        : ElmRxPattern<TMsg, TModel, TMsgType> {
+        : ElmRxPattern<TMsg, TModel, TMsgType> => {
         return [type, reducer];
     }
     /**
@@ -31,14 +30,30 @@ export class ElmArch<TModel, TMsgType> {
      * @returns {ElmRxUpdateResult<TModel, TMsgType>}
      * @memberof ElmArch
      */
-    nextWithCmds(newModel: TModel, ...msgs: TMsgType[]): ElmRxUpdateResult<TModel, TMsgType> {
-        if (arguments.length === 1) {
+    nextWithCmds = (newModel: TModel, ...msgs: TMsgType[]): ElmRxUpdateResult<TModel, TMsgType> => {
+        if (msgs === undefined || msgs === null) {
             return newModel;
         } else {
             return [newModel, msgs];
         }
     }
-    matchWith<TMsg>($msg: Subject<TMsgType>, patterns: ElmRxPattern<TMsg, TModel, TMsgType>[]) {
+
+    /**
+     * ***Deprecated: Use sendAsync instead*** Generate a result of a new state with a sets of msgs, these msgs will be published after new state is published
+     * @param {TModel} newModel
+     * @param {...TMsgType[]} msgs
+     * @returns {ElmRxUpdateResult<TModel, TMsgType>}
+     * @memberof ElmArch
+     */
+    nextWith = (newModel: TModel, msgs?: TMsgType[] | Promise<TMsgType>): ElmRxUpdateResult<TModel, TMsgType> => {
+        if (msgs === undefined || msgs === null) {
+            return newModel;
+        } else {
+            return [newModel, msgs as any];
+        }
+    }
+
+    private matchWith = <TMsg>($msg: Subject<TMsgType>, patterns: ElmRxPattern<TMsg, TModel, TMsgType>[]) => {
         return (acc: ElmRxUpdateResult<TModel, TMsgType>, msg: TMsg) => {
             const model = acc instanceof Array ? acc[0] : acc;
             for (const it of patterns) {
@@ -50,15 +65,16 @@ export class ElmArch<TModel, TMsgType> {
         };
     }
 
-    begin(initState: TModel, patterns: ElmRxPattern<any, TModel, TMsgType>[], debug = false) {
+    begin = (initState: TModel, patterns: ElmRxPattern<any, TModel, TMsgType>[], debug = false) => {
         this.$model = new BehaviorSubject<TModel>(initState);
+        this.accumulator = this.matchWith(this.$msg, patterns);
         this.$msg.pipe(
             tap(m => {
                 if (debug) {
                     console.log('%cMessage', 'color:blue', m);
                 }
             }),
-            scan(this.matchWith(this.$msg, patterns), initState),
+            scan(this.accumulator, initState),
             tap((result: ElmRxUpdateResult<TModel, TMsgType>) => {
                 if (debug) {
                     if (result instanceof Array) {
@@ -73,7 +89,11 @@ export class ElmArch<TModel, TMsgType> {
                 if (updateResult instanceof Array) {
                     const [model, msgs] = updateResult;
                     this.$model.next(model);
-                    msgs.forEach(m => this.$msg.next(m));
+                    if (msgs instanceof Array) {
+                        msgs.forEach(m => this.$msg.next(m));
+                    } else {
+                        msgs.then(m => this.$msg.next(m));
+                    }
                 } else {
                     this.$model.next(updateResult);
                 }
@@ -81,9 +101,13 @@ export class ElmArch<TModel, TMsgType> {
         return this.$model;
     }
 
-    stop() {
+    stop = () => {
         this.$msg.complete();
         this.$model.complete();
+    }
+
+    compute = (model: TModel, msg: TMsgType) => {
+        return this.accumulator(model, msg);
     }
 
     /**
@@ -99,6 +123,7 @@ export class ElmArch<TModel, TMsgType> {
     /**
      * Dispatch a new msg when you are in update methods
      * 
+     * @deprecated
      * @param {TMsgType} msg 
      * @memberof ElmArch
      */
