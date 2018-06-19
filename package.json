@@ -1,6 +1,6 @@
 {
     "name": "elm-rx",
-    "version": "2.1.1",
+    "version": "3.0.0",
     "main": "index.js",
     "author": "zeeko",
     "license": "MIT",
@@ -24,5 +24,7 @@
     "peerDependencies": {
         "rxjs": "^6.1.0"
     },
-    "dependencies": {}
+    "dependencies": {
+        "ts-action": "^6.0.2"
+    }
 }

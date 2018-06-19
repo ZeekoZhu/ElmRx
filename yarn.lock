@@ -80,6 +80,10 @@ rxjs@^6.1.0:
   dependencies:
     tslib "^1.9.0"
 
+ts-action@^6.0.2:
+  version "6.0.2"
+  resolved "http://registry.npm.taobao.org/ts-action/download/ts-action-6.0.2.tgz#9451cef91faf3aad868de5406209c606ba28128e"
+
 tslib@^1.9.0:
   version "1.9.0"
   resolved "http://registry.npm.taobao.org/tslib/download/tslib-1.9.0.tgz#e37a86fda8cbbaf23a057f473c9f4dc64e5fc2e8"
